@@ -1,0 +1,35 @@
+name: remote_storage_adapter
+on:
+  workflow_dispatch:
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Login Docker hub
+      env:
+        USERNAME: ${{secrets.USERNAME}}
+        PASSWORD: ${{secrets.PASSWORD}}
+      run: |
+        echo "${PASSWORD}" | docker login --username ${USERNAME} --password-stdin ${URL}
+
+    - name: Set up Docker Buildx
+
+      uses: crazy-max/ghaction-docker-buildx@v1
+      with:
+        buildx-version: latest
+    - name: Build dockerfile (with push)
+
+      run: |
+        docker buildx build \
+        --platform=linux/386,linux/amd64,linux/arm64,linux/arm/v6,linux/arm/v7,linux/ppc64le,linux/s390x \
+        --output "type=image,push=true" \
+        --file ./Dockerfile . \
+        --tag 607qwq/prometheus_rsa
+        
+    
+    
